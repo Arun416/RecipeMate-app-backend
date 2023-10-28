@@ -40,7 +40,7 @@ getAllRecipes = async(req,res) =>{
     res.status(200).json({success:"true",data:recipe})
     }
     catch(err){
-        res.status(400).json(error)
+        res.status(400).json(err)
     }
 }
 
@@ -60,25 +60,38 @@ createRecipe = async(req,res)=>{
         profilePic,
         recipe_name,
         description,
+        prep_time,
         ingredients,
         category,
         preparation_steps,
-        servings,recipe_image}= req.body;
+        servings}= req.body;
 
     try{
+        const url = req.protocol + '://' + req.get('host')
+        console.log(url,'url');
+
+        console.log(req.body,'raw');
+        // const imgFile  =  req.files['recipe_image'];
+
+       /*  const recipe_image = imgFiles.map(file => ({
+            name: file.filename,
+            data: file.buffer,
+          })); */
+
         const recipe_info = new RecipesModel({
             username: username,
             profilePic: profilePic,
-            category: category,
+            category: JSON.parse(category),
             recipe_name: recipe_name,
             description: description,
-            ingredients: ingredients,
-            preparation_steps:preparation_steps,
+            prep_time: prep_time,
+            ingredients: JSON.parse(ingredients),
+            preparation_steps:JSON.parse(preparation_steps),
             servings:servings,
-            recipe_image:recipe_image
+            recipe_image: url + '/images/' + req.file.filename
 
         })
-
+        console.log(recipe_info);
         const recipe  = await recipe_info.save();
         res.status(200).json({message:"Recipe Created Successfully",data:recipe})
     }

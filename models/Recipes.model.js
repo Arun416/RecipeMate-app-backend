@@ -30,6 +30,10 @@ const recipesSchema = new mongoose.Schema({
         required: true,
         type:String
     },
+    prep_time:{
+        required: true,
+        type:String
+    },
     ingredients: [ingredientSchema],
     preparation_steps:{
         required: true,
@@ -39,10 +43,7 @@ const recipesSchema = new mongoose.Schema({
         required: true,
         type:Number
     },
-    recipe_image:{
-         type:String
-    }
-},{timestamps: true})
+    recipe_image:{ type: String }},{timestamps: true})
 
 
 
