@@ -25,6 +25,10 @@ const createAccount = async(req,res)=>{
             if(result){
                 res.status(200).json({success:true,message:"Your Account Created Successfully"})
             }
+            else {
+                res.status(400).json({success:true,message:"Something went wrong! user not created"})
+
+            }
         }
     }
     catch(error) {
@@ -39,18 +43,24 @@ const LoginAccount = async(req,res)=>{
 
         let user = await userModel.findOne({ email:email  });
         if (!user) {
-            return res.status(400).send('Incorrect email or password.');
+            return res.status(401).json({ succes:false,message:'Incorrect email or password.'});
         }
 
         const validPassword = await bcrypt.compare(password, user.password);
         if (!validPassword) {
-            return res.status(400).send('Incorrect email or password.');
+            return res.status(401).json({ succes:false,message:'Incorrect email or password.'});
         }
-
-        return res.status(200).json({ success:true, token: jwt.sign({expiresIn: rememberMe ? '30d' : '1d', email: user.email, username: user.username, _id: user._id }, 'PRIVATEKEY') ,data:user});
+        // const expireTime =  Math.floor(Date.now() / 1000) + 3600 * 4;
+        const userData = {
+            username: user.username,
+            email: user.email,
+            id: user._id
+        }
+        const expiresTime = '2m';
+        return res.status(200).json({ success:true, token: jwt.sign({expiresIn: rememberMe==true ? '1d' : expiresTime,userData }, 'PRIVATEKEY') ,data:user});
     }
     catch(error) {
-        res.status(500).send(error);
+        res.status(500).send({message:error});
     }
 }
 

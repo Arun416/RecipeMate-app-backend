@@ -1,7 +1,7 @@
 const {getAllRecipes,
         createRecipe,
         getSingleRecipe,
-        updateRecipe} = require('../controllers/Recipes');
+        updateRecipe,deleteRecipe} = require('../controllers/Recipes');
 
 const router = require('express').Router();
 
@@ -9,9 +9,11 @@ const multer = require('multer');
 
 const path = require('path');
 
+const verifyToken = require('../middlewares/authorization')
+
 const storage = multer.diskStorage({
         destination: (req,file,cb)=>{
-           cb(null, 'images');
+           cb(null, 'images/');
         },
         filename: (req,file,cb)=>{
                 const fileName = file.fieldname+'-'+Date.now()+ path.extname(file.originalname);
@@ -30,9 +32,13 @@ const storage = multer.diskStorage({
         }
       }});
 
-router.get('/',getAllRecipes);
-router.get('/:id',getSingleRecipe);
-router.post('/new',upload.single("recipe_image"),createRecipe);
-router.post('/edit/:id',updateRecipe);
+router.get('/',verifyToken,getAllRecipes);
+
+router.get('/home',getAllRecipes);
+router.get('/:id',verifyToken,getSingleRecipe);
+router.post('/new',upload.single("recipe_image"),verifyToken,createRecipe);
+router.patch('/edit/:id',upload.single("recipe_image"),verifyToken,updateRecipe);
+router.delete('/delete/:id',verifyToken,deleteRecipe);
+
 
 module.exports = router;
