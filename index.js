@@ -12,6 +12,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({extended: true, limit: '10mb'}));
+require('dotenv').config()
 
 app.use('/api/user',user_routes);
 app.use('/api/auth',auth_routes);
@@ -20,7 +21,7 @@ app.use('/api/category',category_routes);
 app.use('/api/trend/recipe',recipe_routes);
 app.use('/images',express.static('images'));
 
-mongoose.connect('mongodb+srv://arun:root@mycluster.qepk5ui.mongodb.net/recipe_mate').then(res=>{
+mongoose.connect(process.env.MONGO_URL).then(res=>{
     if(res){
         console.log("Database connected");
     }
@@ -30,6 +31,6 @@ mongoose.connect('mongodb+srv://arun:root@mycluster.qepk5ui.mongodb.net/recipe_m
 })
 
 
-app.listen('3000',()=>{
+app.listen(process.env.PORT,()=>{
     console.log("Server running on Port : 3000");
 })
