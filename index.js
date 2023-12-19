@@ -12,7 +12,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({extended: true, limit: '10mb'}));
-require('dotenv').config()
+require('dotenv').config();
 
 app.use('/api/user',user_routes);
 app.use('/api/auth',auth_routes);
@@ -21,7 +21,11 @@ app.use('/api/category',category_routes);
 app.use('/api/trend/recipe',recipe_routes);
 app.use('/images',express.static('images'));
 
-mongoose.connect(process.env.MONGO_URL).then(res=>{
+const Url = process.env.MONGO_URL
+const port =process.env.PORT;
+
+console.log(Url,"",port)
+mongoose.connect(Url).then(res=>{
     if(res){
         console.log("Database connected");
     }
@@ -31,6 +35,6 @@ mongoose.connect(process.env.MONGO_URL).then(res=>{
 })
 
 
-app.listen(process.env.PORT,()=>{
+app.listen(port,()=>{
     console.log("Server running on Port : 3000");
 })
