@@ -57,7 +57,7 @@ const LoginAccount = async(req,res)=>{
             id: user._id
         }
         const expiresTime = '2m';
-        return res.status(200).json({ success:true, token: jwt.sign({expiresIn: rememberMe==true ? '1d' : expiresTime,userData }, process.env.PRIVATEKEY) ,data:user});
+        return res.status(200).json({ success:true, token: jwt.sign({expiresIn: rememberMe==true ? '1d' : expiresTime,userData }, process.env.API_SECRET) ,data:user});
     }
     catch(error) {
         res.status(500).send({message:error});
