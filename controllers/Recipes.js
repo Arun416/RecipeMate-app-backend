@@ -20,7 +20,7 @@ const RecipesModel = require("../models/Recipes.model");
 getAllRecipes = async(req,res) =>{
     const username = req.query.user;
     const catName = req.query.cat;
-   
+    res.send('Hello, Get All Recipe')
     try{
         const {page,limit,sortField, sortOrder} = req.query;
         const pageNumber = parseInt(page) || 1;
