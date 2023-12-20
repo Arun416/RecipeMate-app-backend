@@ -5,7 +5,7 @@ const verifyToken=(req,res,next)=> {
     if(bearerHeader){
         const token = bearerHeader.split(' ')[1];
 
-        jwt.verify(token,'PRIVATEKEY',(err,user)=>{
+        jwt.verify(token,process.env.API_SECRET,(err,user)=>{
             if(err){
                 return res.sendStatus(403);
             }
