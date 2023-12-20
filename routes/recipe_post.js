@@ -32,9 +32,10 @@ const storage = multer.diskStorage({
         }
       }});
 
-router.get('/',verifyToken,getAllRecipes);
 
 router.get('/home',getAllRecipes);
+router.get('/',verifyToken,getAllRecipes);
+
 router.get('/:id',verifyToken,getSingleRecipe);
 router.post('/new',upload.single("recipe_image"),verifyToken,createRecipe);
 router.patch('/edit/:id',upload.single("recipe_image"),verifyToken,updateRecipe);
