@@ -12,14 +12,14 @@ const path = require('path');
 const verifyToken = require('../middlewares/authorization')
 
 const storage = multer.diskStorage({
-        destination: (req,file,cb)=>{
+        /* destination: (req,file,cb)=>{
            cb(null, 'images/');
         },
         filename: (req,file,cb)=>{
                 const fileName = file.fieldname+'-'+Date.now()+ path.extname(file.originalname);
                cb(null, fileName); // Set the file name
  
-        }
+        } */
  })
  
  const upload =  multer({storage: storage,

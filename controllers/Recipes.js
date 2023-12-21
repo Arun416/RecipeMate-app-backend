@@ -2,23 +2,6 @@ const RecipesModel = require("../models/Recipes.model");
 const cloudinary = require('../utils/cloudinary');
 
 
-/* getAllRecipes = async(req,res)=>{
-    try{
-    const recipes = await RecipesModel.find();
-
-    if(recipes){
-        res.status(200).json({success:"true",data:recipes})
-    }
-    else{
-        res.status(400).send("error")
-    }
-    }
-    catch(err){
-        res.status(400).send("error")
-
-    }
-} */
-
 getAllRecipes = async(req,res) =>{
     const username = req.query.user;
     const catName = req.query.cat;
@@ -131,7 +114,9 @@ const createRecipe = async(req,res)=>{
 
         
 
-        const result = await cloudinary.uploader.upload(req.file.path)
+        const result = await cloudinary.uploader.upload(req.file.path,{
+            folder: 'uploads'
+        })
 
         console.log(result,"cloudinary result")
       /*   const url = req.protocol + '://' + req.get('host')
@@ -200,7 +185,9 @@ const updateRecipe = async(req,res)=>{
 
         const user = await RecipesModel.findById(req.params.id)
         await cloudinary.uploader.destroy(user.cloudinary_id);
-        const result = await cloudinary.uploader.upload(req.file.path)
+        const result = await cloudinary.uploader.upload(req.file.path,{
+            folder: 'uploads'
+        })
         req.body.recipe_image = result.secure_url || user.recipe_image || null;
         req.body.cloudinary_id = result.public_id || user.cloudinary_id;
 
