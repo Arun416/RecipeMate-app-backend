@@ -1,4 +1,6 @@
 const RecipesModel = require("../models/Recipes.model");
+const cloudinary = require('../utils/cloudinary');
+
 
 /* getAllRecipes = async(req,res)=>{
     try{
@@ -115,7 +117,6 @@ getSingleRecipe = async(req,res) =>{
 
 const createRecipe = async(req,res)=>{
    
-        console.log(req.body.recipe_name);
     try {
 
         const{username,
@@ -128,13 +129,16 @@ const createRecipe = async(req,res)=>{
             preparation_steps,
             servings}= req.body;
 
+        
 
-        const url = req.protocol + '://' + req.get('host')
-        console.log(url,'url');
+        const result = await cloudinary.uploader.upload(req.file.path)
 
+        console.log(result,"cloudinary result")
+      /*   const url = req.protocol + '://' + req.get('host')
+        console.log(url,'url'); */
+        
         console.log(req.body,'raw');
         // const imgFile  =  req.files['recipe_image'];
-
        /*  const recipe_image = imgFiles.map(file => ({
             name: file.filename,
             data: file.buffer,
@@ -150,7 +154,9 @@ const createRecipe = async(req,res)=>{
             ingredients: JSON.parse(ingredients),
             preparation_steps:JSON.parse(preparation_steps),
             servings:servings,
-            recipe_image: url + '/images/' + req.file.filename
+            recipe_image: result.secure_url,
+            cloudinary_id: result.public_id
+            // recipe_image: url + '/images/' + req.file.filename
 
         })
         console.log(recipe_info);
@@ -169,21 +175,12 @@ const createRecipe = async(req,res)=>{
 
 
 const updateRecipe = async(req,res)=>{
-    const url = req.protocol + '://' + req.get('host')
-    console.log(req.params.id);
+
+    // const url = req.protocol + '://' + req.get('host')  for local disk
+   
     req.body.category = JSON.parse(req.body.category);
     req.body.ingredients = JSON.parse(req.body.ingredients);
     req.body.preparation_steps = JSON.parse(req.body.preparation_steps) 
-    if (req.file) {
-        // If an image was uploaded, use the newly uploaded file
-        req.body.recipe_image = url + '/images/' + req.file.filename
-    } else if (req.body.recipe_image) {
-        // If no file was uploaded but an existing image path is provided in the request body, use it
-        req.body.recipe_image  = req.body.recipe_image;
-    } else {
-        // No file uploaded and no existing image path provided
-        req.body.recipe_image = null;
-    }
    
     /* const recipe_updated_info = new RecipesModel({
         username: req.body.username,
@@ -201,13 +198,19 @@ const updateRecipe = async(req,res)=>{
 
     try {
 
-         const ID = req.params.id;
-         const options = { new: true };
+        const user = await RecipesModel.findById(req.params.id)
+        await cloudinary.uploader.destroy(user.cloudinary_id);
+        const result = await cloudinary.uploader.upload(req.file.path)
+        req.body.recipe_image = result.secure_url || user.recipe_image || null;
+        req.body.cloudinary_id = result.public_id || user.cloudinary_id;
+
+        const ID = req.params.id;
+        const options = { new: true };
         console.log(req.body.recipe_image);
-        const result = await RecipesModel.findByIdAndUpdate(ID,req.body,options);
-        if(result){
+        const result1 = await RecipesModel.findByIdAndUpdate(ID,req.body,options);
+        if(result1){
         const editedRecipe = await RecipesModel.findById(ID)
-        res.status(200).json({message:"Recipe Updated Successfully",data:result})
+        res.status(200).json({message:"Recipe Updated Successfully",data:result1})
         }
 
     }
@@ -219,19 +222,18 @@ const updateRecipe = async(req,res)=>{
 
 deleteRecipe = async(req,res)=>{
     try{
-        const id = req.params.id;
-        // const recipe = await RecipesModel.findById(id);
-        
-            const deletedItem = await RecipesModel.findByIdAndRemove(id);
-            if (!deletedItem) {
+             const id = req.params.id;
+             let recipe = await RecipesModel.findById(id);
+            
+            // const deletedItem = await RecipesModel.findByIdAndRemove(id);
+          
+            await recipe.deleteOne();
+            await cloudinary.uploader.destroy(recipe.cloudinary_id);
+          /*   if (!recipe) {
                 return res.status(404).json({ message: 'Item not found' });
-            }
+            } */
            
-
-            const refreshRecipes = await RecipesModel.findById(id);
-            if(refreshRecipes){
-                res.status(200).json({ message: 'Recipe deleted successfully', refreshRecipes });
-            }
+            res.status(200).json({ message: 'Recipe deleted successfully', recipe });
         
     }
     catch(error){

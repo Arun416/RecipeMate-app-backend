@@ -43,7 +43,12 @@ const recipesSchema = new mongoose.Schema({
         required: true,
         type:Number
     },
-    recipe_image:{ type: String }},{timestamps: true})
+    recipe_image:{ type: String },
+    cloudinary_id: {type:String}
+
+    }
+    
+    ,{timestamps: true})
 
 
 
